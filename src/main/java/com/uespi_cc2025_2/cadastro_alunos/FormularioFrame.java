@@ -1,4 +1,4 @@
-package com.uespi.cc20252.trabalho.poo;
+package com.uespi_cc2025_2.cadastro_alunos;
 
 public class FormularioFrame extends javax.swing.JFrame {
     
