@@ -1,7 +1,5 @@
 package com.uespi_cc2025_2.cadastro_alunos;
 
-import com.uespi_cc2025_2.cadastro_alunos.service.AlunoService;
-
 public class FormularioFrame extends javax.swing.JFrame {
     
     private AlunoService alunoService = new AlunoService();
@@ -50,6 +48,10 @@ public class FormularioFrame extends javax.swing.JFrame {
 
         txtMatricula.addActionListener(this::txtMatriculaActionPerformed);
 
+        txtNome.addActionListener(this::txtNomeActionPerformed);
+
+        txtDataNascimento.addActionListener(this::txtDataNascimentoActionPerformed);
+
         jLabel4.setText("Idade:");
 
         txtIdade.addActionListener(this::txtIdadeActionPerformed);
@@ -63,22 +65,22 @@ public class FormularioFrame extends javax.swing.JFrame {
         txtTelefone.addActionListener(this::txtTelefoneActionPerformed);
 
         jButton1.setText("Salvar");
-        jButton1.addActionListener(this::jButton1ActionPerformed);
+        jButton1.addActionListener(this::salvarActionPerformed);
 
         jButton2.setText("Excluir");
-        jButton2.addActionListener(this::jButton2ActionPerformed);
+        jButton2.addActionListener(this::excluirActionPerformed);
 
         jButton3.setText("Pesquisar");
-        jButton3.addActionListener(this::jButton3ActionPerformed);
+        jButton3.addActionListener(this::pesquisarActionPerformed);
 
         jButton4.setText("Mais Novo / Mais Velho");
-        jButton4.addActionListener(this::jButton4ActionPerformed);
+        jButton4.addActionListener(this::maisNovoVelhoActionPerformed);
 
         jButton5.setText("Inserção na posição");
-        jButton5.addActionListener(this::jButton5ActionPerformed);
+        jButton5.addActionListener(this::insercaoActionPerformed);
 
         jButton6.setText("Listagem");
-        jButton6.addActionListener(this::jButton6ActionPerformed);
+        jButton6.addActionListener(this::listagemActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -128,7 +130,7 @@ public class FormularioFrame extends javax.swing.JFrame {
                             .addComponent(txtIdade, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtTelefone, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)
                             .addComponent(txtCpf))))
-                .addContainerGap(17, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -181,78 +183,100 @@ public class FormularioFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtTelefoneActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-    try {
-    String matricula = txtMatricula.getText().trim();
-    String nome = txtNome.getText().trim();
-    String dataNascimento = txtDataNascimento.getText().trim();
-    String idadeTexto = txtIdade.getText().trim();
-    String cpf = txtCpf.getText().trim();
-    String telefone = txtTelefone.getText().trim();
+    private void salvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_salvarActionPerformed
 
-    if (matricula.isEmpty() || nome.isEmpty() ||
-        dataNascimento.isEmpty() || idadeTexto.isEmpty() ||
-        cpf.isEmpty() || telefone.isEmpty()) {
+        try {
+            String matricula = txtMatricula.getText().trim();
+            String nome = txtNome.getText().trim();
+            String dataNascimento = txtDataNascimento.getText().trim();
+            String idadeTexto = txtIdade.getText().trim();
+            String cpf = txtCpf.getText().trim();
+            String telefone = txtTelefone.getText().trim();
 
-        javax.swing.JOptionPane.showMessageDialog(this,
-                "Preencha todos os campos!");
-        return;
-    }
+            if (matricula.isEmpty() || nome.isEmpty() ||
+                dataNascimento.isEmpty() || idadeTexto.isEmpty() ||
+                cpf.isEmpty() || telefone.isEmpty()) {
 
-    int idade = Integer.parseInt(idadeTexto);
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Preencha todos os campos!");
+                return;
+            }
 
-    java.text.SimpleDateFormat formato =
-            new java.text.SimpleDateFormat("dd/MM/yyyy");
-    formato.setLenient(false);
+            int idade = Integer.parseInt(idadeTexto);
 
-    java.util.Date data = formato.parse(dataNascimento);
+            java.text.SimpleDateFormat formato =
+                    new java.text.SimpleDateFormat("dd/MM/yyyy");
+            formato.setLenient(false);
 
-    Aluno aluno = new Aluno();
-    aluno.setMatricula(matricula);
-    aluno.setNome(nome);
-    aluno.setIdade(idade);
-    aluno.setDataNascimento(data);
-    aluno.setCpf(cpf);
-    aluno.setTelefone(telefone);
+            java.util.Date data = formato.parse(dataNascimento);
 
-    alunoService.cadastrarAluno(aluno);
+            Aluno aluno = new Aluno();
+            aluno.setMatricula(matricula);
+            aluno.setNome(nome);
+            aluno.setIdade(idade);
+            aluno.setDataNascimento(data);
+            aluno.setCpf(cpf);
+            aluno.setTelefone(telefone);
 
-    javax.swing.JOptionPane.showMessageDialog(this,
-            "Aluno cadastrado com sucesso!");
+            alunoService.cadastrarAluno(aluno);
 
-} catch (NumberFormatException e) {
-    javax.swing.JOptionPane.showMessageDialog(this,
-            "A idade deve ser um número inteiro!");
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Aluno cadastrado com sucesso!");
 
-} catch (java.text.ParseException e) {
-    javax.swing.JOptionPane.showMessageDialog(this,
-            "Data inválida! Utilize dd/MM/yyyy.");
+        } catch (NumberFormatException e) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "A idade deve ser um número inteiro!");
 
-} catch (IllegalArgumentException e) {
-    javax.swing.JOptionPane.showMessageDialog(this,
-            e.getMessage());
-}
-    }//GEN-LAST:event_jButton1ActionPerformed
+        } catch (java.text.ParseException e) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Data inválida! Utilize dd/MM/yyyy.");
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        } catch (IllegalArgumentException e) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    e.getMessage());
+        }
+    }//GEN-LAST:event_salvarActionPerformed
+
+    private void excluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_excluirActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_excluirActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void pesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pesquisarActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_pesquisarActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void maisNovoVelhoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_maisNovoVelhoActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }//GEN-LAST:event_maisNovoVelhoActionPerformed
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+    private void insercaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insercaoActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton5ActionPerformed
+    }//GEN-LAST:event_insercaoActionPerformed
 
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+    private void listagemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listagemActionPerformed
+        
+        
+        if (!alunoService.getAlunos().isEmpty()) {
+            
+            for (Aluno a : alunoService.getAlunos()) {
+               javax.swing.JOptionPane.showMessageDialog(this,
+                    "Matricula: " + a.getMatricula() +
+                    "\nNome: " + a.getNome() +
+                    "\nIdade: " + a.getIdade() +
+                    "\nData de nascimento: " + a.getDataNascimento() +
+                    "\nTelefone: " + a.getTelefone() +
+                    "\nCPF: " + a.getCpf()); 
+            }
+        }
+    }//GEN-LAST:event_listagemActionPerformed
+
+    private void txtNomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNomeActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton6ActionPerformed
+    }//GEN-LAST:event_txtNomeActionPerformed
+
+    private void txtDataNascimentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDataNascimentoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtDataNascimentoActionPerformed
 
     /**
      * @param args the command line arguments
