@@ -238,19 +238,175 @@ public class FormularioFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_salvarActionPerformed
 
     private void excluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_excluirActionPerformed
-        // TODO add your handling code here:
+    String matricula = txtMatricula.getText().trim();
+
+if (matricula.isEmpty()) {
+    javax.swing.JOptionPane.showMessageDialog(this,
+            "Informe a matrícula do aluno!");
+    return;
+}
+
+Aluno encontrado = null;
+
+for (Aluno a : alunoService.getAlunos()) {
+    if (a.getMatricula().equals(matricula)) {
+        encontrado = a;
+        break;
+    }
+}
+
+if (encontrado != null) {
+
+    RemocaoAlunoDAO dao = new RemocaoAlunoDAO();
+
+    dao.removerAluno(alunoService.getAlunos(), encontrado);
+
+    javax.swing.JOptionPane.showMessageDialog(this,
+            "Aluno excluído com sucesso!");
+
+} else {
+    javax.swing.JOptionPane.showMessageDialog(this,
+            "Aluno não encontrado!");
+}
     }//GEN-LAST:event_excluirActionPerformed
 
     private void pesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pesquisarActionPerformed
-        // TODO add your handling code here:
+        String matricula = txtMatricula.getText().trim();
+
+            if (matricula.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Informe a matrícula para pesquisar!");
+            return;
+        }
+
+        Aluno encontrado = null;
+
+            for (Aluno a : alunoService.getAlunos()) {
+            if (a.getMatricula().equals(matricula)) {
+                encontrado = a;
+            break;
+        }
+    }
+
+        int quantidade = alunoService.getAlunos().size();
+
+        if (encontrado != null) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+            "Aluno encontrado!" +
+            "\nMatrícula: " + encontrado.getMatricula() +
+            "\nNome: " + encontrado.getNome() +
+            "\nQuantidade de alunos na lista: " + quantidade);
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this,
+            "Aluno não encontrado!" +
+            "\nQuantidade de alunos na lista: " + quantidade);
+        }
     }//GEN-LAST:event_pesquisarActionPerformed
 
     private void maisNovoVelhoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_maisNovoVelhoActionPerformed
-        // TODO add your handling code here:
+    if (alunoService.getAlunos().isEmpty()) {
+    javax.swing.JOptionPane.showMessageDialog(this,
+            "Não existem alunos cadastrados!");
+    return;
+}
+
+Aluno maisNovo = alunoService.getAlunos().get(0);
+Aluno maisVelho = alunoService.getAlunos().get(0);
+
+for (Aluno a : alunoService.getAlunos()) {
+
+    if (a.getIdade() < maisNovo.getIdade()) {
+        maisNovo = a;
+    }
+
+    if (a.getIdade() > maisVelho.getIdade()) {
+        maisVelho = a;
+    }
+}
+
+javax.swing.JOptionPane.showMessageDialog(this,
+        "Aluno mais novo: " + maisNovo.getNome() +
+        "\nIdade: " + maisNovo.getIdade() +
+        "\n\nAluno mais velho: " + maisVelho.getNome() +
+        "\nIdade: " + maisVelho.getIdade());
     }//GEN-LAST:event_maisNovoVelhoActionPerformed
 
     private void insercaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insercaoActionPerformed
-        // TODO add your handling code here:
+     String posicaoTexto = javax.swing.JOptionPane.showInputDialog(this,
+            "Informe a posição em que deseja inserir o aluno:");
+
+    if (posicaoTexto == null) {
+        return;
+    }
+
+    int posicao;
+
+    try {
+        posicao = Integer.parseInt(posicaoTexto);
+    } catch (NumberFormatException e) {
+        javax.swing.JOptionPane.showMessageDialog(this,
+                "Informe uma posição numérica!");
+        return;
+    }
+    if (posicao < 0 || posicao > alunoService.getAlunos().size()) {
+    javax.swing.JOptionPane.showMessageDialog(this,
+            "Posição inválida!");
+    return;
+}
+    try {
+    String matricula = txtMatricula.getText().trim();
+    String nome = txtNome.getText().trim();
+    String dataNascimento = txtDataNascimento.getText().trim();
+    String idadeTexto = txtIdade.getText().trim();
+    String cpf = txtCpf.getText().trim();
+    String telefone = txtTelefone.getText().trim();
+
+    if (matricula.isEmpty() || nome.isEmpty()
+            || dataNascimento.isEmpty() || idadeTexto.isEmpty()
+            || cpf.isEmpty() || telefone.isEmpty()) {
+
+        javax.swing.JOptionPane.showMessageDialog(this,
+                "Preencha todos os campos!");
+        return;
+    }
+
+    int idade = Integer.parseInt(idadeTexto);
+
+    java.text.SimpleDateFormat formato =
+            new java.text.SimpleDateFormat("dd/MM/yyyy");
+    formato.setLenient(false);
+
+    java.util.Date data = formato.parse(dataNascimento);
+
+    Aluno aluno = new Aluno();
+    aluno.setMatricula(matricula);
+    aluno.setNome(nome);
+    aluno.setIdade(idade);
+    aluno.setDataNascimento(data);
+    aluno.setCpf(cpf);
+    aluno.setTelefone(telefone);
+    
+    for (Aluno a : alunoService.getAlunos()) {
+    if (a.getMatricula().equals(matricula)) {
+        javax.swing.JOptionPane.showMessageDialog(this,
+                "Matrícula já cadastrada!");
+        return;
+    }
+}
+
+    alunoService.getAlunos().add(posicao, aluno);
+
+    javax.swing.JOptionPane.showMessageDialog(this,
+        "Aluno inserido com sucesso!");
+
+    } catch (NumberFormatException e) {
+        javax.swing.JOptionPane.showMessageDialog(this,
+            "A idade deve ser um número inteiro!");
+
+    } catch (java.text.ParseException e) {
+        javax.swing.JOptionPane.showMessageDialog(this,
+            "Data inválida! Utilize dd/MM/yyyy.");
+    }
     }//GEN-LAST:event_insercaoActionPerformed
 
     private void listagemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listagemActionPerformed
