@@ -10,5 +10,5 @@
         <maven.compiler.release>26</maven.compiler.release>
         <exec.mainClass>com.uespi.cc20252.trabalho.poo.TrabalhoPoo</exec.mainClass>
     </properties>
-    <name>cadastro-alunos v1.1.0</name>
+    <name>cadastro-alunos v1.2.0</name>
 </project>
