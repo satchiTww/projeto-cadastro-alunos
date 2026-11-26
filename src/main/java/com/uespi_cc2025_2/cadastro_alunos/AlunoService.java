@@ -26,9 +26,24 @@ public class AlunoService {
         alunos.add(aluno);
     }
 
+    //consultar quantidade de alunos
+    public int getQtdAlunos() {
+        return alunos.size();
+    }
+    
     // Consultar lista de alunos
     public List<Aluno> getAlunos() {
         return alunos;
     }
-
+    
+    //receber string com informacoes de um aluno
+    public String getAlunoInfo(Aluno a) {
+        return "Matricula: " + a.getMatricula() + 
+            "\nNome: " + a.getNome() +
+            "\nIdade: " + a.getIdade() +
+            "\nData de nascimento: " + a.getDataNascimento() +
+            "\nTelefone: " + a.getTelefone() +
+            "\nCPF: " + a.getCpf()
+        ;
+    }
 }

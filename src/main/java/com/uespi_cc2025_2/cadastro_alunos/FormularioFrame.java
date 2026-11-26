@@ -1,5 +1,11 @@
 package com.uespi_cc2025_2.cadastro_alunos;
 
+import javax.swing.JOptionPane;
+//imports usados no menu de lista
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
+import java.awt.Dimension;
+
 public class FormularioFrame extends javax.swing.JFrame {
     
     private AlunoService alunoService = new AlunoService();
@@ -8,6 +14,56 @@ public class FormularioFrame extends javax.swing.JFrame {
 
     public FormularioFrame() {
         initComponents();
+    }
+    
+    //funcao vai ser chamada tanto no botao salvar quanto no botao inserção na posição (evita copiar e colar codigo)
+    private void salvarAluno() {
+        try {
+            String matricula = txtMatricula.getText().trim();
+            String nome = txtNome.getText().trim();
+            String dataNascimento = txtDataNascimento.getText().trim();
+            String idadeTexto = txtIdade.getText().trim();
+            String cpf = txtCpf.getText().trim();
+            String telefone = txtTelefone.getText().trim();
+
+            if (matricula.isEmpty() || nome.isEmpty() ||
+                dataNascimento.isEmpty() || idadeTexto.isEmpty() ||
+                cpf.isEmpty() || telefone.isEmpty()) {
+
+                javax.swing.JOptionPane.showMessageDialog(this, "Preencha todos os campos!");
+                return;
+            }
+
+            int idade = Integer.parseInt(idadeTexto);
+
+            java.text.SimpleDateFormat formato = new java.text.SimpleDateFormat("dd/MM/yyyy");
+            formato.setLenient(false);
+
+            java.util.Date data = formato.parse(dataNascimento);
+
+            Aluno aluno = new Aluno();
+            aluno.setMatricula(matricula);
+            aluno.setNome(nome);
+            aluno.setIdade(idade);
+            aluno.setDataNascimento(data);
+            aluno.setCpf(cpf);
+            aluno.setTelefone(telefone);
+
+            alunoService.cadastrarAluno(aluno);
+            
+            //TODO: Salvar aluno no BD
+
+            javax.swing.JOptionPane.showMessageDialog(this, "Aluno cadastrado com sucesso!");
+
+        } catch (NumberFormatException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "A idade deve ser um número inteiro!");
+
+        } catch (java.text.ParseException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Data inválida! Utilize dd/MM/yyyy.");
+
+        } catch (IllegalArgumentException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, e.getMessage());
+        }
     }
 
     /**
@@ -184,246 +240,194 @@ public class FormularioFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_txtTelefoneActionPerformed
 
     private void salvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_salvarActionPerformed
-
-        try {
-            String matricula = txtMatricula.getText().trim();
-            String nome = txtNome.getText().trim();
-            String dataNascimento = txtDataNascimento.getText().trim();
-            String idadeTexto = txtIdade.getText().trim();
-            String cpf = txtCpf.getText().trim();
-            String telefone = txtTelefone.getText().trim();
-
-            if (matricula.isEmpty() || nome.isEmpty() ||
-                dataNascimento.isEmpty() || idadeTexto.isEmpty() ||
-                cpf.isEmpty() || telefone.isEmpty()) {
-
-                javax.swing.JOptionPane.showMessageDialog(this,
-                        "Preencha todos os campos!");
-                return;
-            }
-
-            int idade = Integer.parseInt(idadeTexto);
-
-            java.text.SimpleDateFormat formato =
-                    new java.text.SimpleDateFormat("dd/MM/yyyy");
-            formato.setLenient(false);
-
-            java.util.Date data = formato.parse(dataNascimento);
-
-            Aluno aluno = new Aluno();
-            aluno.setMatricula(matricula);
-            aluno.setNome(nome);
-            aluno.setIdade(idade);
-            aluno.setDataNascimento(data);
-            aluno.setCpf(cpf);
-            aluno.setTelefone(telefone);
-
-            alunoService.cadastrarAluno(aluno);
-
-            javax.swing.JOptionPane.showMessageDialog(this,
-                    "Aluno cadastrado com sucesso!");
-
-        } catch (NumberFormatException e) {
-            javax.swing.JOptionPane.showMessageDialog(this,
-                    "A idade deve ser um número inteiro!");
-
-        } catch (java.text.ParseException e) {
-            javax.swing.JOptionPane.showMessageDialog(this,
-                    "Data inválida! Utilize dd/MM/yyyy.");
-
-        } catch (IllegalArgumentException e) {
-            javax.swing.JOptionPane.showMessageDialog(this,
-                    e.getMessage());
-        }
+        salvarAluno();
     }//GEN-LAST:event_salvarActionPerformed
 
     private void excluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_excluirActionPerformed
-    String matricula = txtMatricula.getText().trim();
+    
+        //se nao tiver alunos cadastrados
+        if (alunoService.getQtdAlunos() == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Não há alunos cadastrados!");
+            return;
+        }
+        
+        String matricula;
+        
+        //enquanto tiver algum problema, continue na janela de inserir matricula
+        while (true) {
+            
+            matricula = JOptionPane.showInputDialog(this, "Selecione a matricula: ").trim();
+            
+            if (matricula == null) {break;}
+            
+            if (matricula.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Informe a matricula do aluno para a exclusão!");
+                
+                continue;
+            }
+            
+            Aluno encontrado = null;
 
-if (matricula.isEmpty()) {
-    javax.swing.JOptionPane.showMessageDialog(this,
-            "Informe a matrícula do aluno!");
-    return;
-}
+            for (Aluno a : alunoService.getAlunos()) {
+                if (a.getMatricula().equals(matricula)) {
+                    encontrado = a;
+                    break;
+                }
+            }
 
-Aluno encontrado = null;
+            if (encontrado != null) {
+                
+                if (JOptionPane.showConfirmDialog(this,
+                        alunoService.getAlunoInfo(encontrado) + 
+                        "\nDeseja apagar a matricula deste aluno?") != JOptionPane.OK_OPTION) {
+                    continue;
+                }
 
-for (Aluno a : alunoService.getAlunos()) {
-    if (a.getMatricula().equals(matricula)) {
-        encontrado = a;
-        break;
-    }
-}
+                //remove aluno
+                RemocaoAlunoDAO dao = new RemocaoAlunoDAO();
+                dao.removerAluno(alunoService.getAlunos(), encontrado);
+                javax.swing.JOptionPane.showMessageDialog(this, "Aluno excluído com sucesso!");
+                
+                break;
 
-if (encontrado != null) {
-
-    RemocaoAlunoDAO dao = new RemocaoAlunoDAO();
-
-    dao.removerAluno(alunoService.getAlunos(), encontrado);
-
-    javax.swing.JOptionPane.showMessageDialog(this,
-            "Aluno excluído com sucesso!");
-
-} else {
-    javax.swing.JOptionPane.showMessageDialog(this,
-            "Aluno não encontrado!");
-}
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, "Aluno não encontrado!");
+            }
+            
+        }
     }//GEN-LAST:event_excluirActionPerformed
 
     private void pesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pesquisarActionPerformed
-        String matricula = txtMatricula.getText().trim();
-
-            if (matricula.isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(this,
-                "Informe a matrícula para pesquisar!");
+        
+        //se nao tiver alunos cadastrados
+        if (alunoService.getQtdAlunos() == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Não há alunos cadastrados!");
             return;
         }
-
-        Aluno encontrado = null;
+        
+        String matricula;
+        
+        //enquanto tiver algum problema, continue na janela de pesquisa
+        while (true) {
+            matricula = JOptionPane.showInputDialog(this, "Selecione a matricula: ").trim();
+            
+            if (matricula == null) {break;}
+            
+            if (matricula.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Informe a matrícula do aluno para a pesquisa!");
+                
+                continue;
+            }
+            
+            Aluno encontrado = null;
 
             for (Aluno a : alunoService.getAlunos()) {
-            if (a.getMatricula().equals(matricula)) {
-                encontrado = a;
-            break;
-        }
-    }
+                if (a.getMatricula().equals(matricula)) {
+                    encontrado = a;
+                    break;
+                }
+            }
+            
+            int quantidade = alunoService.getQtdAlunos();
 
-        int quantidade = alunoService.getAlunos().size();
-
-        if (encontrado != null) {
-            javax.swing.JOptionPane.showMessageDialog(this,
-            "Aluno encontrado!" +
-            "\nMatrícula: " + encontrado.getMatricula() +
-            "\nNome: " + encontrado.getNome() +
-            "\nQuantidade de alunos na lista: " + quantidade);
-        } else {
-            javax.swing.JOptionPane.showMessageDialog(this,
-            "Aluno não encontrado!" +
-            "\nQuantidade de alunos na lista: " + quantidade);
+            if (encontrado != null) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                "Aluno encontrado!\n" + 
+                alunoService.getAlunoInfo(encontrado) +
+                "\nQuantidade de alunos na lista: " + quantidade);
+                
+                break;
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                "Aluno não encontrado!" +
+                "\nQuantidade de alunos na lista: " + quantidade);
+            }
         }
     }//GEN-LAST:event_pesquisarActionPerformed
 
     private void maisNovoVelhoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_maisNovoVelhoActionPerformed
-    if (alunoService.getAlunos().isEmpty()) {
-    javax.swing.JOptionPane.showMessageDialog(this,
-            "Não existem alunos cadastrados!");
-    return;
-}
+        if (alunoService.getQtdAlunos() == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Não há alunos cadastrados!");
+            return;
+        }
 
-Aluno maisNovo = alunoService.getAlunos().get(0);
-Aluno maisVelho = alunoService.getAlunos().get(0);
+        Aluno maisNovo = alunoService.getAlunos().get(0);
+        Aluno maisVelho = alunoService.getAlunos().get(0);
 
-for (Aluno a : alunoService.getAlunos()) {
+        for (Aluno a : alunoService.getAlunos()) {
 
-    if (a.getIdade() < maisNovo.getIdade()) {
-        maisNovo = a;
-    }
+            if (a.getIdade() < maisNovo.getIdade()) {
+                maisNovo = a;
+            }
 
-    if (a.getIdade() > maisVelho.getIdade()) {
-        maisVelho = a;
-    }
-}
+            if (a.getIdade() > maisVelho.getIdade()) {
+                maisVelho = a;
+            }
+        }
 
-javax.swing.JOptionPane.showMessageDialog(this,
-        "Aluno mais novo: " + maisNovo.getNome() +
-        "\nIdade: " + maisNovo.getIdade() +
-        "\n\nAluno mais velho: " + maisVelho.getNome() +
-        "\nIdade: " + maisVelho.getIdade());
+        javax.swing.JOptionPane.showMessageDialog(this,
+            "Aluno mais novo: " + maisNovo.getNome() +
+            "\nIdade: " + maisNovo.getIdade() +
+            "\n\nAluno mais velho: " + maisVelho.getNome() +
+            "\nIdade: " + maisVelho.getIdade())
+        ;
     }//GEN-LAST:event_maisNovoVelhoActionPerformed
 
     private void insercaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insercaoActionPerformed
-     String posicaoTexto = javax.swing.JOptionPane.showInputDialog(this,
-            "Informe a posição em que deseja inserir o aluno:");
+        
+        String posicaoTexto = javax.swing.JOptionPane.showInputDialog(this, 
+            "Informe a posição em que deseja inserir o aluno:")
+        ;
 
-    if (posicaoTexto == null) {
-        return;
-    }
+        if (posicaoTexto == null) {
+            return;
+        }
 
-    int posicao;
+       int posicao;
 
-    try {
-        posicao = Integer.parseInt(posicaoTexto);
-    } catch (NumberFormatException e) {
-        javax.swing.JOptionPane.showMessageDialog(this,
-                "Informe uma posição numérica!");
-        return;
-    }
-    if (posicao < 0 || posicao > alunoService.getAlunos().size()) {
-    javax.swing.JOptionPane.showMessageDialog(this,
-            "Posição inválida!");
-    return;
-}
-    try {
-    String matricula = txtMatricula.getText().trim();
-    String nome = txtNome.getText().trim();
-    String dataNascimento = txtDataNascimento.getText().trim();
-    String idadeTexto = txtIdade.getText().trim();
-    String cpf = txtCpf.getText().trim();
-    String telefone = txtTelefone.getText().trim();
-
-    if (matricula.isEmpty() || nome.isEmpty()
-            || dataNascimento.isEmpty() || idadeTexto.isEmpty()
-            || cpf.isEmpty() || telefone.isEmpty()) {
-
-        javax.swing.JOptionPane.showMessageDialog(this,
-                "Preencha todos os campos!");
-        return;
-    }
-
-    int idade = Integer.parseInt(idadeTexto);
-
-    java.text.SimpleDateFormat formato =
-            new java.text.SimpleDateFormat("dd/MM/yyyy");
-    formato.setLenient(false);
-
-    java.util.Date data = formato.parse(dataNascimento);
-
-    Aluno aluno = new Aluno();
-    aluno.setMatricula(matricula);
-    aluno.setNome(nome);
-    aluno.setIdade(idade);
-    aluno.setDataNascimento(data);
-    aluno.setCpf(cpf);
-    aluno.setTelefone(telefone);
-    
-    for (Aluno a : alunoService.getAlunos()) {
-    if (a.getMatricula().equals(matricula)) {
-        javax.swing.JOptionPane.showMessageDialog(this,
-                "Matrícula já cadastrada!");
-        return;
-    }
-}
-
-    alunoService.getAlunos().add(posicao, aluno);
-
-    javax.swing.JOptionPane.showMessageDialog(this,
-        "Aluno inserido com sucesso!");
-
-    } catch (NumberFormatException e) {
-        javax.swing.JOptionPane.showMessageDialog(this,
-            "A idade deve ser um número inteiro!");
-
-    } catch (java.text.ParseException e) {
-        javax.swing.JOptionPane.showMessageDialog(this,
-            "Data inválida! Utilize dd/MM/yyyy.");
-    }
+        try {
+            posicao = Integer.parseInt(posicaoTexto);
+        } catch (NumberFormatException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Informe uma posição numérica!");
+            return;
+        }
+        
+        //nota: não era pra ser possivel adicionar um aluno em qualquer posição > 0? (questao 1 letra f)
+        if (posicao < 0 || posicao > alunoService.getAlunos().size()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Posição inválida!");
+            return;
+        }
+        
+        salvarAluno();
     }//GEN-LAST:event_insercaoActionPerformed
 
     private void listagemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listagemActionPerformed
         
-        
-        if (!alunoService.getAlunos().isEmpty()) {
-            
-            for (Aluno a : alunoService.getAlunos()) {
-               javax.swing.JOptionPane.showMessageDialog(this,
-                    "Matricula: " + a.getMatricula() +
-                    "\nNome: " + a.getNome() +
-                    "\nIdade: " + a.getIdade() +
-                    "\nData de nascimento: " + a.getDataNascimento() +
-                    "\nTelefone: " + a.getTelefone() +
-                    "\nCPF: " + a.getCpf()); 
-            }
+        if (alunoService.getQtdAlunos() == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Não há alunos cadastrados!");
+            return;
         }
+        
+        String mensagem = "Alunos Cadastrados:\n\n";
+        
+        for (Aluno a : alunoService.getAlunos()) {
+            mensagem = mensagem.concat(alunoService.getAlunoInfo(a) + "\n\n");
+        }
+
+        JTextArea areaTexto = new JTextArea(mensagem);
+        areaTexto.setLineWrap(true);
+        areaTexto.setWrapStyleWord(true);
+        areaTexto.setEditable(false);
+
+        JScrollPane scrollPane = new JScrollPane(areaTexto);
+        scrollPane.setPreferredSize(new Dimension(350, 200));
+
+        JOptionPane.showMessageDialog(
+            this,
+            scrollPane,
+            "Lista",
+            JOptionPane.INFORMATION_MESSAGE
+        );
     }//GEN-LAST:event_listagemActionPerformed
 
     private void txtNomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNomeActionPerformed

@@ -1,5 +1,6 @@
 package com.uespi_cc2025_2.cadastro_alunos;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Aluno {
@@ -54,8 +55,9 @@ public class Aluno {
         return this.idade;
     }
     
-    public Date getDataNascimento() {
-        return this.dataNascimento;
+    public String getDataNascimento() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        return sdf.format(this.dataNascimento);
     }
 
     public String getTelefone() {
